@@ -136,6 +136,10 @@ genrule(
   ]),
 )
 
+linux_srcs = glob([
+  'src/libmongoc/src/mongoc/mongoc-rand-common-crypto.c',
+])
+
 macos_srcs = glob([
   'src/libmongoc/src/mongoc/mongoc-rand-common-crypto.c',
 ])
@@ -144,7 +148,7 @@ windows_srcs = glob([
   'src/libmongoc/src/mongoc/mongoc-rand-cng.c',
 ])
 
-platform_srcs = macos_srcs + windows_srcs
+platform_srcs = linux_srcs + macos_srcs + windows_srcs
 
 cxx_library(
   name = 'mongoc',
@@ -166,12 +170,13 @@ cxx_library(
   ]),
   srcs = glob([
     'src/libmongoc/src/**/*.c',
-  ]),
+  ], exclude = platform_srcs),
   platform_preprocessor_flags = [
     ('^macos.*', gcc_pp_flags),
     ('^linux.*', gcc_pp_flags),
   ],
   platform_srcs = [
+    ('linux.*', linux_srcs),
     ('macos.*', macos_srcs),
     ('windows.*', windows_srcs),
   ],
